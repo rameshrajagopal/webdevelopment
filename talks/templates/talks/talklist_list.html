@@ -10,7 +10,8 @@
         <ul class="list-group">
             {% for object in object_list %}
             <li class="list-group-item">
-                <a href="{{ object.get_absoulte_url }}">{{ object }} </a>
+                <a class="close" aria-hidden="true" class="pull-right" href="{{ object.get_remove_url }}">x</a>
+                <a href="{{ object.get_absolute_url }}">{{ object }}</a>
             </li>
             {% empty %}
             <li class="list-group-item"> You have no lists </li>
@@ -18,7 +19,7 @@
         </ul>
     </div>
     <div class="col-sm-6">
-        <p> <a href="#" class="btn">Create a new list </a></p>
+        <p> <a href="{% url 'talks:lists:create' %}" class="btn">Create a new list </a></p>
     </div>
 </div>
 {% endblock %}

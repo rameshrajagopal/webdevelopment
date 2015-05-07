@@ -32,8 +32,9 @@
 <a href="{% url 'login' %}" class="btn btn-default navbar-btn">Login</a>
 {% else %}
 <a href="{% url 'logout' %}" class="btn btn-default navbar-btn">Logout</a>
+<a href="{% url 'talks:lists:list' %}" class="btn btn-primary navbar-btn"> Talk lists </a>
 {% endif %}
-        </div><!--/.navbar-collapse -->
+      </div><!--/.navbar-collapse -->
       </div>
     </div>
 {% if messages %}

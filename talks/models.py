@@ -21,3 +21,6 @@ class TalkList(models.Model):
 
     def get_absolute_url(self):
         return reverse('talks:lists:detail', kwargs={'slug': self.slug})
+
+    def get_remove_url(self):
+        return reverse('talks:lists:remove', kwargs={'slug': self.slug})

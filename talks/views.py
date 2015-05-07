@@ -1,17 +1,57 @@
-from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponse
 
-from braces import views
 from . import models
+from . import forms
+from braces import views
 
 # Create your views here.
-class TalkListDetailView(generic.View):
-    def get(self, *args, **kwargs):
-        return HttpResponse("A Talk list")
+class RestrictToUserMixin(object):
+    def get_queryset(self):
+        queryset = super(RestrictToUserMixin, self).get_queryset()
+        queryset = queryset.filter(user=self.request.user)
+        return queryset
 
-class TalkListListView(views.LoginRequiredMixin, generic.ListView):
+class TalkListDetailView(RestrictToUserMixin,
+#        views.PrefetchRelatedMixin,
+        views.LoginRequiredMixin,
+        generic.DetailView):
+    model = models.TalkList
+    prefetch_related = ('talks',)
+
+
+class TalkListListView(RestrictToUserMixin,
+            views.LoginRequiredMixin,
+            generic.ListView):
     model = models.TalkList
 
-    def get_queryset(self):
-        return self.request.user.lists.all()
+class TalkListCreateView(
+     views.LoginRequiredMixin,
+     views.SetHeadlineMixin,
+     generic.CreateView
+ ):
+     form_class = forms.TalkListForm
+     headline = 'Create'
+     model = models.TalkList
+
+     def form_valid(self, form):
+         self.object = form.save(commit=False)
+         self.object.user = self.request.user
+         self.object.save()
+         return super(TalkListCreateView, self).form_valid(form)
+
+class TalkListUpdateView(
+        RestrictToUserMixin,
+        views.LoginRequiredMixin,
+        views.SetHeadlineMixin,
+        generic.UpdateView
+    ):
+        form_class = forms.TalkListForm
+        headline = 'update'
+        model = models.TalkList
+
+class TalkListRemoveView(
+        views.LoginRequiredMixin,
+        generic.ListView
+    ):
+       model = models.TalkList
