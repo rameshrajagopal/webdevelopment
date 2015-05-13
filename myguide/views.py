@@ -12,6 +12,9 @@ from talks.models import TalkList
 class HomePageView(generic.TemplateView):
     template_name = 'home.html'
 
+    def get_context_data(self, **kwargs):
+        return super(HomePageView, self).get_context_data(**kwargs)
+
 class SignUpView(views.AnonymousRequiredMixin, 
                  views.FormValidMessageMixin, 
                  generic.CreateView):
@@ -23,6 +26,8 @@ class SignUpView(views.AnonymousRequiredMixin,
 
     def form_valid(self, form):
         resp = super(SignUpView, self).form_valid(form)
+        print(self.object)
+        print(form)
         TalkList.objects.create(user=self.object, name='To Attend')
         return resp
 

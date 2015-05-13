@@ -24,3 +24,29 @@ class TalkList(models.Model):
 
     def get_remove_url(self):
         return reverse('talks:lists:remove', kwargs={'slug': self.slug})
+
+class Talk(models.Model):
+    ROOM_CHOICES  = (
+            ('517D', '517D'),
+            ('517A', '517A'),
+            ('517B', '517B'),
+            ('517C', '517C'),
+            ('517E', '517E'),
+            )
+    talk_list = models.ForeignKey(TalkList, related_name='talks')
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+    when = models.DateTimeField()
+    room = models.CharField(max_length=10, choices=ROOM_CHOICES)
+    host = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('when', 'room')
+        unique_together = ('talk_list', 'name')
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Talk,self).save(*args, **kwargs)
