@@ -154,4 +154,19 @@ class TalksDetailView(views.LoginRequiredMixin,
                     generic.DetailView
     ):
         model = models.Talk
+        template_name = 'talks/talk_detail.html'
 
+        def get_queryset(self): 
+            print('queryset')
+            self.queryset =  self.model.objects.filter(talk_list__user=self.request.user)
+            return self.queryset
+
+        def get(self, request, *args, **kwargs): 
+            print('get')
+            self.queryset = self.get_queryset()
+            print(self.queryset)
+            print(kwargs.get('slug'))
+            self.object = self.queryset.filter(slug=kwargs.get('slug'))
+            print(self.object)
+            return super(TalksDetailView, self).get(request, *args,
+                    **kwargs)

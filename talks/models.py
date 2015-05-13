@@ -50,3 +50,7 @@ class Talk(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Talk,self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('talks:talks:detail', kwargs={'slug': self.slug})
+
