@@ -154,19 +154,35 @@ class TalksDetailView(views.LoginRequiredMixin,
                     generic.DetailView
     ):
         model = models.Talk
-        template_name = 'talks/talk_detail.html'
+        http_method_names = ['get', 'post']
 
         def get_queryset(self): 
-            print('queryset')
+            print("get_queryset")
             self.queryset =  self.model.objects.filter(talk_list__user=self.request.user)
             return self.queryset
 
-        def get(self, request, *args, **kwargs): 
-            print('get')
-            self.queryset = self.get_queryset()
-            print(self.queryset)
-            print(kwargs.get('slug'))
-            self.object = self.queryset.filter(slug=kwargs.get('slug'))
-            print(self.object)
-            return super(TalksDetailView, self).get(request, *args,
-                    **kwargs)
+        def get_context_data(self, **kwargs):
+            print("get_context_data")
+            context = super(TalksDetailView, self).get_context_data(**kwargs)
+            obj = context['object']
+            print(context)
+            rating_form = forms.TalkRatingForm(self.request.POST or None, instance=obj)
+            list_form = forms.TalkTalkListForm(self.request.POST or None, instance=obj)
+            context.update({'rating_form': rating_form, 
+                            'list_form' : list_form})
+            return context
+
+        def post(self, request, *args, **kwargs):
+            print("post", self.request.POST)
+            self.object = self.get_object()
+            if 'save' in request.POST:
+                talk_form = forms.TalkRatingForm(request.POST or None,
+                    instance=self.object)
+                if talk_form.is_valid():
+                    talk_form.save()
+            if 'move' in request.POST:
+                list_form = forms.TalkTalkListForm(request.POST or None,
+                        instance=self.object, user=request.user)
+                if list_form.is_valid():
+                    list_form.save()
+            return redirect(self.object)
